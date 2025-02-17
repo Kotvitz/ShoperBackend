@@ -1,0 +1,6 @@
+@ShoperBackend_HostAddress = http://localhost:5194
+
+GET {{ShoperBackend_HostAddress}}/shoper/
+Accept: application/json
+
+###
