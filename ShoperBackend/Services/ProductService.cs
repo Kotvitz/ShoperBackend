@@ -31,11 +31,12 @@ namespace ShoperBackend.Services
                         return shopResponse.List
                             .Where(p => p.Translations?.Pl_PL?.Name?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
                             .Select(p => new ProductDto
-                        {
-                            ProductId = p.ProductId,
-                            Name = p.Translations!.Pl_PL!.Name,
-                            ShortDescription = p.Translations?.Pl_PL?.ShortDescription
-                        });
+                            {
+                                ProductId = p.ProductId,
+                                Name = p.Translations!.Pl_PL!.Name,
+                                ShortDescription = p.Translations?.Pl_PL?.ShortDescription,
+                                Description = p.Translations?.Pl_PL?.Description
+                            });
                     }
                 }
                 else

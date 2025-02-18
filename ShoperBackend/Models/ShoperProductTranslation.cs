@@ -9,5 +9,8 @@ namespace ShoperBackend.Models
 
         [JsonPropertyName("short_description")]
         public string? ShortDescription { get; set; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
     }
 }
