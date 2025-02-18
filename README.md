@@ -1,6 +1,6 @@
 # ShoperBackend
 
-This is the backend API for the Shoper integration project, built with ASP.NET Core and .NET 9. It integrates with the Shoper.pl API to retrieve product data and provide a JSON endpoint for product suggestions.
+This is the backend API for the **Shoper App** project, built with ASP.NET Core and .NET 9. It integrates with the Shoper.pl API to retrieve product data and provide a JSON endpoint for product suggestions.
 
 ## Features
 
