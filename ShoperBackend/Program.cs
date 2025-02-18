@@ -17,7 +17,25 @@ internal class Program
             }
         });
 
+        var corsPolicy = "_allowFrontend";
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(corsPolicy, builder =>
+            {
+                builder.WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+            });
+        });
+
         var app = builder.Build();
+
+        app.UseCors(corsPolicy);
+
+        app.UseStaticFiles();
+        app.UseRouting();
+        app.UseAuthorization();
 
         app.MapControllers();
 
