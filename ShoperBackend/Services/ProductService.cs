@@ -14,9 +14,8 @@ namespace ShoperBackend.Services
             if (string.IsNullOrWhiteSpace(searchTerm) || searchTerm.Length < 3)
                 return Enumerable.Empty<ProductDto>();
 
-            string filterJson = $"{{\"translations.pl_PL.name\":\"{searchTerm}\"}}";
             var shopUrl = _configuration["Shoper:ShopUrl"]?.TrimEnd('/');
-            var requestUri = $"{shopUrl}/webapi/rest/products?filters={Uri.EscapeDataString(filterJson)}";
+            var requestUri = $"{shopUrl}/webapi/rest/products";
 
             try
             {
@@ -29,7 +28,9 @@ namespace ShoperBackend.Services
 
                     if (shopResponse?.List != null)
                     {
-                        return shopResponse.List.Select(p => new ProductDto
+                        return shopResponse.List
+                            .Where(p => p.Translations?.Pl_PL?.Name?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+                            .Select(p => new ProductDto
                         {
                             ProductId = p.ProductId,
                             Name = p.Translations!.Pl_PL!.Name,
