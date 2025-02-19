@@ -20,35 +20,39 @@ namespace ShoperBackend.Services
             try
             {
                 var response = await _httpClient.GetAsync(requestUri);
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
+                response.EnsureSuccessStatusCode();
 
-                    var shopResponse = JsonSerializer.Deserialize<ShoperResponse>(content, ProductServiceHelpers.Default);
+                var content = await response.Content.ReadAsStringAsync();
+                var shopResponse = JsonSerializer.Deserialize<ShoperResponse>(content, ProductServiceHelpers.Default);
 
-                    if (shopResponse?.List != null)
+                if (shopResponse?.List == null)
+                    return [];
+
+                return shopResponse.List
+                    .Where(p => p.Translations?.Pl_PL?.Name?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+                    .Select(p => new ProductDto
                     {
-                        return shopResponse.List
-                            .Where(p => p.Translations?.Pl_PL?.Name?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
-                            .Select(p => new ProductDto
-                            {
-                                ProductId = p.ProductId,
-                                Name = p.Translations!.Pl_PL!.Name,
-                                ShortDescription = p.Translations?.Pl_PL?.ShortDescription,
-                                Description = p.Translations?.Pl_PL?.Description
-                            });
-                    }
-                }
-                else
-                {
-                    _logger.LogError("Error retrieving products from Shoper API. StatusCode: {StatusCode}", response.StatusCode);
-                }
+                        ProductId = p.ProductId,
+                        Name = p.Translations!.Pl_PL!.Name,
+                        ShortDescription = p.Translations?.Pl_PL?.ShortDescription,
+                        Description = p.Translations?.Pl_PL?.Description
+                    });
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "HTTP request error: {RequestUri}", requestUri);
+                throw new ApplicationException("Error fetching data from Shoper API", httpEx);
+            }
+            catch (JsonException jsonEx)
+            {
+                _logger.LogError(jsonEx, "Error parsing JSON from Shoper API response.");
+                throw new ApplicationException("Invalid response format from Shoper API", jsonEx);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while calling Shoper API.");
+                _logger.LogError(ex, "Error calling Shoper API: {RequestUri}", requestUri);
+                throw new ApplicationException("Failed to fetch products from the API", ex);
             }
-            return Enumerable.Empty<ProductDto>();
         }
     }
 }
